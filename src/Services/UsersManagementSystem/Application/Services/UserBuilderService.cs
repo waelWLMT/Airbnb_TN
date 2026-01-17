@@ -48,6 +48,22 @@ namespace Application.Services
                 CreatedAt = DateTime.UtcNow
             };
             return user;
-        }        
+        }
+
+        public static AuthResult? BuildUserAuthResult(User user)
+        {
+            var authResult = new AuthResult
+            {
+                UserId = user.Id,
+                Email = user.Email,
+                Nom = user.Nom,
+                Prenom = user.Prenom,
+                RoleId = user.RoleId,
+                Role = user.UserRole != null ? UserRoleBuilderService.BuildUserRoleReadDto(user.UserRole) : new RoleReadDto(),
+                IsActive = user.IsActive
+            };
+            
+            return authResult;
+        }
     }
 }

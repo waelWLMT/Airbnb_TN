@@ -10,10 +10,10 @@ namespace WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class UsersController : ControllerBase
     {
         private readonly IMediator _mediator;
-        public UserController(IMediator mediator)
+        public UsersController(IMediator mediator)
         {
             _mediator = mediator;
         }
@@ -29,10 +29,10 @@ namespace WebApi.Controllers
 
             var users = await _mediator.Send(query);
 
-            if(users == null) return new List<UserReadDto>();
+            if (users == null) return new List<UserReadDto>();
 
             return UserBuilderService.BuildUserReadDtoList(users);
-            
+
         }
 
         [HttpGet("GetUserById")]
@@ -46,10 +46,10 @@ namespace WebApi.Controllers
             var user = await _mediator.Send(query);
 
             if (user == null) return null;
-            
+
 
             return UserBuilderService.BuildUserReadDto(user);
-            
+
         }
 
         [HttpPost("CreateUser")]
@@ -96,22 +96,24 @@ namespace WebApi.Controllers
 
         }
 
-        [HttpGet("GetUserByEmailAndPassword")]
-        public async Task<UserReadDto?> GetUserByEmailAndPassword(string email, string password)
+       
+        [HttpPost("ValidateCredentials")]
+        public async Task<ActionResult<AuthResult>> ValidateCredentials(AuthCredentialsData authCredentialsData)
         {
             var query = new GetUserByEmailAndPasswordQuery()
             {
-                Email = email,
-                Password = password
+                Email = authCredentialsData.Email,
+                Password = authCredentialsData.Password
             };
+
             var user = await _mediator.Send(query);
 
-            if (user == null) return null;
+            if (user == null)
+                return Unauthorized();
 
-            return UserBuilderService.BuildUserReadDto(user);
+            return Ok(UserBuilderService.BuildUserAuthResult(user));
 
         }
-    
-    
+
     }
 }

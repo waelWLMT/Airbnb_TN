@@ -74,7 +74,6 @@ namespace Infrastructure.Repositories
             return await query.FirstOrDefaultAsync(cancellation);
 
         }
-
         public async Task<IEnumerable<User>> ListAsync(CancellationToken ct = default, bool isAsNoTracking = false)
         {
             var query = _context.Users.AsQueryable();
@@ -83,7 +82,6 @@ namespace Infrastructure.Repositories
 
             return await query.ToListAsync(ct);
         }
-
         public async Task<IEnumerable<User>> ListAsync(Expression<Func<User, bool>> predicate, bool isAsNoTracking = false, CancellationToken ct = default, params Expression<Func<User, object>>[] includes)
         {
             var query = _context.Users.AsQueryable();

@@ -20,23 +20,23 @@ namespace Tests.PresentationTests
 
     public class UserControllerTest
     {
-        private readonly UserController _userController;
-        private readonly Mock<IMediator> _mediator;
+        private readonly UsersController _userController;
+        private readonly Mock<IMediator> _moqMediator;
 
         public UserControllerTest()
         {
-            _mediator = new Mock<IMediator>();
-            _userController = new UserController(_mediator.Object);
+            _moqMediator = new Mock<IMediator>();
+            _userController = new UsersController(_moqMediator.Object);
         }
 
-        
+
         [Fact]
         public async Task GetAllUsers_ReturnsEmptyList_WhenNoUsersExist()
         {
             // Arrange
             var users = new List<User>();
 
-            _mediator.Setup(m => m.Send(It.IsAny<GetAllUsersQuery>(), It.IsAny<CancellationToken>()))
+            _moqMediator.Setup(m => m.Send(It.IsAny<GetAllUsersQuery>(), It.IsAny<CancellationToken>()))
                      .ReturnsAsync(users);
             // Act
             var result = await _userController.GetAllUsers(false, true);
@@ -52,15 +52,15 @@ namespace Tests.PresentationTests
             // Arrange
             var users = UsersTestData.GetSamplesUsers();
 
-            _mediator.Setup(m => m.Send(It.IsAny<GetAllUsersQuery>(), It.IsAny<CancellationToken>()))
+            _moqMediator.Setup(m => m.Send(It.IsAny<GetAllUsersQuery>(), It.IsAny<CancellationToken>()))
                      .ReturnsAsync(users);
             // Act
-            var result = await _userController.GetAllUsers(false, true);            
+            var result = await _userController.GetAllUsers(false, true);
 
             // Assert            
             Assert.NotNull(result);
-            Assert.NotEmpty(result);  
-           
+            Assert.NotEmpty(result);
+
         }
 
         [Fact]
@@ -68,7 +68,7 @@ namespace Tests.PresentationTests
         {
             // Arrange
             var userId = Guid.NewGuid();
-            _mediator.Setup(m => m.Send(It.IsAny<GetUserByIdQuery>(), It.IsAny<CancellationToken>()))
+            _moqMediator.Setup(m => m.Send(It.IsAny<GetUserByIdQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((User?)null);
 
             // Act
@@ -82,7 +82,7 @@ namespace Tests.PresentationTests
         public async Task CreateUser_ShouldCreateAndReturnsUserReadDto()
         {
             // Arrange
-            _mediator.Setup(m => m.Send(It.IsAny<CreateUserCommand>(), It.IsAny<CancellationToken>()))
+            _moqMediator.Setup(m => m.Send(It.IsAny<CreateUserCommand>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(UsersTestData.GetSampleUser());
             // Act
             var result = await _userController.CreateUser(UsersTestData.GetFakeUserCreateDto());
@@ -98,7 +98,7 @@ namespace Tests.PresentationTests
         {
             // Arrange
             var userId = Guid.NewGuid();
-            _mediator.Setup(m => m.Send(It.IsAny<DeleteUserCommand>(), It.IsAny<CancellationToken>()))
+            _moqMediator.Setup(m => m.Send(It.IsAny<DeleteUserCommand>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(true);
 
             // Act
@@ -113,9 +113,9 @@ namespace Tests.PresentationTests
         public async Task UpdateUser_ShouldUpdateAndReturnUserReadDto()
         {
             // Arrange
-            _mediator.Setup(m => m.Send(It.IsAny<UpdateUserCommand>(), It.IsAny<CancellationToken>()))
+            _moqMediator.Setup(m => m.Send(It.IsAny<UpdateUserCommand>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(UsersTestData.GetSampleUser());
-            
+
             var userUpdateDto = new UserUpdateDto
             {
 
@@ -141,27 +141,62 @@ namespace Tests.PresentationTests
         }
 
         [Fact]
-        public async Task GetUserByEmailAndPassword_ShouldReturnUserReadDto_WhenCredentialsAreValid()
+        public async Task ValidateCredentials_ShouldReturnAuthResult_WhenCredentialsAreValid()
         {
             // Arrange
             var email = "xunit.test@gmail.com";
             var password = "testpassword";
 
-            _mediator.Setup(m => m.Send(It.IsAny<GetUserByEmailAndPasswordQuery>(), It.IsAny<CancellationToken>()))
+            _moqMediator.Setup(m => m.Send(It.IsAny<GetUserByEmailAndPasswordQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(UsersTestData.GetSampleUser());
 
+            var authCredentialsData = new AuthCredentialsData
+            {
+                Email = email,
+                Password = password
+            };
+
             // Act
-            var result = await _userController.GetUserByEmailAndPassword(email, password);
-            var resultType = result?.GetType();
+            var response = await _userController.ValidateCredentials(authCredentialsData);
 
             // Assert
-            Assert.NotNull(result);
-            Assert.Equal(typeof(UserReadDto), resultType);
-            Assert.Equal("xunit.test@gmail.com", result.Email);
-        
+            Assert.NotNull(response);
+            Assert.IsType<OkObjectResult>(response.Result);
+
+
+            _moqMediator
+                .Verify(m => m.Send(It.IsAny<GetUserByEmailAndPasswordQuery>(), It.IsAny<CancellationToken>()), Times.Once);
+
         }
 
-        
-    }
+        [Fact]
+        public async Task ValidateCredentials_ShouldReturnUnauthorized_WhenCredentialsAreInvalid()
+        {
+            // Arrange
+            var email = "";
+            var password = "wrongpassword";
 
+            _moqMediator.Setup(m => m.Send(It.IsAny<GetUserByEmailAndPasswordQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((User?)null);
+
+            var authCredentialsData = new AuthCredentialsData
+            {
+                Email = email,
+                Password = password
+            };
+
+            // Act
+            var response = await _userController.ValidateCredentials(authCredentialsData);
+
+            // Assert
+            Assert.NotNull(response);
+            Assert.IsType<UnauthorizedResult>(response.Result);
+
+            _moqMediator
+                .Verify(m => m.Send(It.IsAny<GetUserByEmailAndPasswordQuery>(), It.IsAny<CancellationToken>()), Times.Once);
+
+
+        }
+
+    }
 }

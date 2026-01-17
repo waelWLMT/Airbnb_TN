@@ -35,9 +35,12 @@ namespace Tests.ApplicationTests.HandlerTests
                 Password = "test"
             };
 
+            var users = new List<User>() { UsersTestData.GetSampleUser() };            
+            users[0].PasswordHash = PasswordService.HashPassword(query.Password);
+
             _moqUserReadRepository
-                .Setup(repo => repo.GetOneAsync(It.IsAny<CancellationToken>(), It.IsAny<FindOptions?>()))
-                .ReturnsAsync(UsersTestData.GetSampleUser());
+                .Setup(repo => repo.GetAllAsync(It.IsAny<CancellationToken>(), It.IsAny<FindOptions?>()))
+                .ReturnsAsync(users);
 
             _moqUnitOfWork.Setup(uow => uow.GetRequiredRepository<IUserReadRepository>())
                 .Returns(_moqUserReadRepository.Object);
@@ -48,14 +51,13 @@ namespace Tests.ApplicationTests.HandlerTests
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal(query.Email, result!.Email);
-            Assert.Equal(query.Password, result.PasswordHash);
+            Assert.Equal(query.Email, result!.Email);           
 
             _moqUnitOfWork
                 .Verify(uow => uow.GetRequiredRepository<IUserReadRepository>(), Times.Once);
 
             _moqUserReadRepository
-                .Verify(repo => repo.GetOneAsync(It.IsAny<CancellationToken>(), It.IsAny<FindOptions?>()), Times.Once);
+                .Verify(repo => repo.GetAllAsync(It.IsAny<CancellationToken>(), It.IsAny<FindOptions?>()), Times.Once);
 
         }
 
@@ -69,9 +71,11 @@ namespace Tests.ApplicationTests.HandlerTests
                 Password = "wrong_password"
             };
 
+            var users = new List<User>();
+
             _moqUserReadRepository
-                .Setup(repo => repo.GetOneAsync(It.IsAny<CancellationToken>(), It.IsAny<FindOptions?>()))
-                .ReturnsAsync((User?)null);
+                .Setup(repo => repo.GetAllAsync(It.IsAny<CancellationToken>(), It.IsAny<FindOptions?>()))
+                .ReturnsAsync(users);
 
             _moqUnitOfWork
                 .Setup(uow => uow.GetRequiredRepository<IUserReadRepository>())
@@ -89,7 +93,7 @@ namespace Tests.ApplicationTests.HandlerTests
                 .Verify(uow => uow.GetRequiredRepository<IUserReadRepository>(), Times.Once);
             
             _moqUserReadRepository
-                .Verify(repo => repo.GetOneAsync(It.IsAny<CancellationToken>(), It.IsAny<FindOptions?>()), Times.Once);
+                .Verify(repo => repo.GetAllAsync(It.IsAny<CancellationToken>(), It.IsAny<FindOptions?>()), Times.Once);
 
         }
     }

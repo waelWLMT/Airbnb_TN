@@ -15,13 +15,13 @@ namespace Tests.PresentationTests
     public class RoleControllerTest
     {
         private readonly Mock<IMediator> _mediator;
-        private readonly RoleController _roleController;
+        private readonly RolesController _roleController;
 
 
         public RoleControllerTest()
         {
             _mediator = new Mock<IMediator>();
-            _roleController = new RoleController(_mediator.Object);
+            _roleController = new RolesController(_mediator.Object);
         }
 
         [Fact]

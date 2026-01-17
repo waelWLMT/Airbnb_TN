@@ -33,8 +33,11 @@ if (app.Environment.IsDevelopment())
 
 app.MapControllers();
 
+if (app.Environment.IsProduction())
+{
+    app.UseHttpsRedirection();
+}
 
-app.UseHttpsRedirection();
 
 var summaries = new[]
 {

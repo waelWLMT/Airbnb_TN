@@ -23,14 +23,17 @@ namespace Application.UseCases.Handlers
         }
         public async Task<User?> Handle(GetUserByEmailAndPasswordQuery request, CancellationToken cancellationToken)
         {
+
             var findOptions = new FindOptions()
                 .BuildFindOptions(
-                u => u.Email == request.Email && PasswordService.VerifyPassword(request.Password, u.PasswordHash),
+                u => u.Email == request.Email,
                 false,
                 u => u.UserRole
-                );            
+                );
 
-            return await _userReadRepository.GetOneAsync(cancellationToken, findOptions);
+            var users = await _userReadRepository.GetAllAsync(cancellationToken, findOptions);  
+
+            return users.Find(u => PasswordService.VerifyPassword(request.Password, u.PasswordHash));
 
         }
     }
