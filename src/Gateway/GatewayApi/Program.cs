@@ -1,30 +1,78 @@
+using System.Text;
+using GatewayApi.Extensions;
+using GatewayApi.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Yarp.ReverseProxy;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
+var configuration = builder.Configuration;
+var environment = builder.Environment;
 
-// Ajouter YARP
+// -------------------------------
+// YARP Reverse Proxy
+// -------------------------------
 builder.Services.AddReverseProxy()
-    .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
+       .LoadFromConfig(configuration.GetSection("ReverseProxy"));
 
-// Ajouter JWT Auth pour sécuriser la Gateway
-//builder.Services.(JwtBearerDefaults.AuthenticationScheme)
-//    .AddJwtBearer(options =>
-//    {
-//        options.Authority = "http://localhost:5007"; // AuthService
-//        options.RequireHttpsMetadata = false;
-//        options.Audience = "gateway_api";
-//    });
+builder.Services.AddJwtAuthentication(configuration);
 
+
+
+// -------------------------------
+// Configurer l'authentification JWT
+// -------------------------------
+var jwtSection = configuration.GetSection("Jwt");
+var key = Convert.FromBase64String(jwtSection["Key"]!);
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {       
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ValidateIssuer = true,
+        ValidIssuer = jwtSection["Issuer"],
+        ValidateAudience = true,
+        ValidAudience = jwtSection["Audience"],
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.Zero
+        
+    };
+    
+});
+
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-//app.UseAuthentication();
-//app.UseAuthorization();
+// -------------------------------
+// Middleware pipeline
+// -------------------------------
 
-// Rediriger toutes les requêtes vers YARP
+// Authentification standard ASP.NET Core
+app.UseAuthentication();
+app.UseAuthorization();
+
+// Custom JWT middleware pour gérer routes publiques et claims
+app.UseMiddleware<JwtMiddleware>();
+
+// HTTPS redirection en production
+if (environment.IsProduction())
+{
+    app.UseHttpsRedirection();
+}
+
+// Reverse Proxy
 app.MapReverseProxy();
 
-app.MapGet("/", () => "Hello World!");
+// Test route
+app.MapGet("/", () => "Gateway API running!");
 
+// Lancer l'application
 app.Run();
+
