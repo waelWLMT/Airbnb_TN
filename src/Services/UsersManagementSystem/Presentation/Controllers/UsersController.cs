@@ -3,6 +3,7 @@ using Application.Services;
 using Application.UseCases.Commands;
 using Application.UseCases.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,7 +19,7 @@ namespace WebApi.Controllers
             _mediator = mediator;
         }
 
-        [HttpGet("GetAllUsers")]
+        [HttpGet("GetAllUsers")]       
         public async Task<List<UserReadDto>> GetAllUsers(bool userWithRole, bool isReadOnly)
         {
             var query = new GetAllUsersQuery()
