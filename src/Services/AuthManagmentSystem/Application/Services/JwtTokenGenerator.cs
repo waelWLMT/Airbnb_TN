@@ -26,9 +26,8 @@ namespace Application.Services
         public string CreateToken(IEnumerable<Claim> claims)
         {
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secret));
+            var key = new SymmetricSecurityKey(Convert.FromBase64String(_secret));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
             var token = new JwtSecurityToken(
                 issuer: _issuer,
                 audience: _audience,

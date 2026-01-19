@@ -12,11 +12,11 @@ namespace Application.Services
 {
     public class TokenService : ITokenService
     {
-        private readonly ITokenGenerator _tokenProvider;
+        private readonly ITokenGenerator _tokenGenerator;
 
-        public TokenService(ITokenGenerator tokenProvider)
+        public TokenService(ITokenGenerator tokenGenerator)
         {
-            _tokenProvider = tokenProvider;
+            _tokenGenerator = tokenGenerator;
         }
 
         public string GenerateToken(AuthResult user)
@@ -26,11 +26,10 @@ namespace Application.Services
                 new Claim(JwtRegisteredClaimNames.Sub, user.UserId.ToString()),
                 new Claim(JwtRegisteredClaimNames.GivenName, user.Prenom ?? ""),
                 new Claim(JwtRegisteredClaimNames.FamilyName, user.Nom ?? ""),
-                new Claim(ClaimTypes.Role, user.Role.Code ?? ""),
                 new Claim("RoleId", user.RoleId.ToString())
             };
 
-            return _tokenProvider.CreateToken(claims);
+            return _tokenGenerator.CreateToken(claims);
         }
     }
 }
