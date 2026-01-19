@@ -1,8 +1,8 @@
-using System.Text;
-using GatewayApi.Extensions;
 using GatewayApi.Middlewares;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -14,39 +14,14 @@ var environment = builder.Environment;
 builder.Services.AddReverseProxy()
        .LoadFromConfig(configuration.GetSection("ReverseProxy"));
 
-builder.Services.AddJwtAuthentication(configuration);
-
-
-
 // -------------------------------
-// Configurer l'authentification JWT
+// Authorization standard (pour [Authorize])
 // -------------------------------
-var jwtSection = configuration.GetSection("Jwt");
-var key = Convert.FromBase64String(jwtSection["Key"]!);
-
-builder.Services.AddAuthentication(options =>
+builder.Services.AddAuthorization(options =>
 {
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
-    {       
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(key),
-        ValidateIssuer = true,
-        ValidIssuer = jwtSection["Issuer"],
-        ValidateAudience = true,
-        ValidAudience = jwtSection["Audience"],
-        ValidateLifetime = true,
-        ClockSkew = TimeSpan.Zero
-        
-    };
-    
+    options.AddPolicy("AuthenticatedUser", policy =>
+        policy.RequireAuthenticatedUser());
 });
-
-builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -54,18 +29,17 @@ var app = builder.Build();
 // Middleware pipeline
 // -------------------------------
 
-// Authentification standard ASP.NET Core
-app.UseAuthentication();
-app.UseAuthorization();
-
-// Custom JWT middleware pour gérer routes publiques et claims
-app.UseMiddleware<JwtMiddleware>();
-
 // HTTPS redirection en production
 if (environment.IsProduction())
 {
     app.UseHttpsRedirection();
 }
+
+// JWT Middleware : validation + mapping claims
+app.UseMiddleware<JwtMiddleware>();
+
+// Authorization pour [Authorize] sur routes protégées
+app.UseAuthorization();
 
 // Reverse Proxy
 app.MapReverseProxy();
@@ -75,4 +49,3 @@ app.MapGet("/", () => "Gateway API running!");
 
 // Lancer l'application
 app.Run();
-
