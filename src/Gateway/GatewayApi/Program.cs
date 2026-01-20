@@ -25,9 +25,6 @@ builder.Services.AddAuthorization(options =>
 
 var app = builder.Build();
 
-// -------------------------------
-// Middleware pipeline
-// -------------------------------
 
 // HTTPS redirection en production
 if (environment.IsProduction())

@@ -1,8 +1,10 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
 using Microsoft.IdentityModel.Tokens;
+using Yarp.ReverseProxy.Model;
 
 namespace GatewayApi.Middlewares
 {
@@ -10,20 +12,17 @@ namespace GatewayApi.Middlewares
     {
         private readonly RequestDelegate _next;
         private readonly IConfiguration _configuration;
-        private readonly List<string> _publicRoutes;
 
         public JwtMiddleware(RequestDelegate next, IConfiguration configuration)
         {
             _next = next;
             _configuration = configuration;
-            _publicRoutes = GetPublicRoutes();
         }
         public async Task InvokeAsync(HttpContext context)
         {
             var path = context.Request.Path.Value;
 
-            // Routes publiques
-            if (_publicRoutes.Any(r => path.StartsWith(r, StringComparison.OrdinalIgnoreCase)))
+            if (IsPublicRoute(context))
             {
                 await _next(context);
                 return;
@@ -83,18 +82,20 @@ namespace GatewayApi.Middlewares
                 context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                 await context.Response.WriteAsync("Unauthorized: Invalid token");
             }
-        }
-        private List<string> GetPublicRoutes()
+        }   
+        
+        private bool IsPublicRoute(HttpContext context)
         {
-            var routes = new List<string>();
-            var section = _configuration.GetSection("ReverseProxy:PublicRoutes");
-            foreach (var route in section.GetChildren())
-            {
-                var path = route.GetSection("Match:Path").Value;
-                if (!string.IsNullOrEmpty(path))
-                    routes.Add(path);
-            }
-            return routes;
+            var endpoint = context.GetEndpoint();
+            if (endpoint is null)
+                return false;
+
+            var routeModel = endpoint.Metadata.GetMetadata<RouteModel>();
+            if (routeModel?.Config?.Metadata is not { } metadata)
+                return false;
+
+            return metadata.TryGetValue("AllowAnonymous", out var value)
+                   && value.Equals("true", StringComparison.OrdinalIgnoreCase);
         }
     }
 }
