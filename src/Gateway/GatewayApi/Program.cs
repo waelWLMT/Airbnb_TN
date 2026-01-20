@@ -29,8 +29,12 @@ var app = builder.Build();
 // HTTPS redirection en production
 if (environment.IsProduction())
 {
+    app.UseHsts();
     app.UseHttpsRedirection();
 }
+app.UseRouting();
+
+app.UseMiddleware<RequestLoggingMiddleware>();
 
 // JWT Middleware : validation + mapping claims
 app.UseMiddleware<JwtMiddleware>();
@@ -46,3 +50,5 @@ app.MapGet("/", () => "Gateway API running!");
 
 // Lancer l'application
 app.Run();
+
+
