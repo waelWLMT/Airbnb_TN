@@ -9,11 +9,11 @@ using Shared.Dtos;
 
 namespace Infrastructure.Clients
 {
-    public class UserManagementClient : IUserManagementClient
+    public class UserManagementHttpClient : IUserManagementHttpClient
     {
         private readonly HttpClient _httpClient;
 
-        public UserManagementClient(HttpClient httpClient)
+        public UserManagementHttpClient(HttpClient httpClient)
         {
             _httpClient = httpClient;
         }

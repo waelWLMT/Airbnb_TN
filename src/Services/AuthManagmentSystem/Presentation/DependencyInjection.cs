@@ -1,8 +1,7 @@
-﻿using Application.Interfaces;
+﻿using Application.AuthProviders;
+using Application.Interfaces;
 using Application.Services;
 using Infrastructure.Clients;
-using Providers;
-
 namespace Presentation
 {
     public static class DependencyInjection
@@ -11,9 +10,9 @@ namespace Presentation
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
             // Register application services here
-            services.AddScoped<IAuthOrchestrator, AuthOrchestrator>();
+            services.AddScoped<IAuthenticationManager, AuthenticationManager>();
             services.AddScoped<ITokenGenerator, JwtTokenGenerator>();
-            services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<IAuthTokenService, AuthTokenService>();
 
             return services;
         }
@@ -26,16 +25,16 @@ namespace Presentation
         public static IServiceCollection AddProviders(this IServiceCollection services)
         {
             // Register provider services here
-            services.AddScoped<IAuthenticatorService, JwtAuthService>();
-            services.AddScoped<IAuthenticatorService, FacebookAuthService>();
-            services.AddScoped<IAuthenticatorService, GoogleAuthService>();
+            services.AddScoped<IAuthenticatorService, JwtAuthProvider>();
+            services.AddScoped<IAuthenticatorService, FacebookAuthProvider>();
+            services.AddScoped<IAuthenticatorService, GoogleAuthProvider>();
 
             return services;
         }
 
         public static IServiceCollection AddInfrastructre(this IServiceCollection services, string userServiceUrl)
         {
-            services.AddHttpClient<IUserManagementClient, UserManagementClient>(client =>
+            services.AddHttpClient<IUserManagementHttpClient, UserManagementHttpClient>(client =>
             {
                 client.BaseAddress = new Uri(userServiceUrl);
             });

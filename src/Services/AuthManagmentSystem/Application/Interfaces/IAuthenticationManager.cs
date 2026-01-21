@@ -7,7 +7,7 @@ using Shared.Dtos;
 
 namespace Application.Interfaces
 {
-    public interface IAuthOrchestrator
+    public interface IAuthenticationManager
     {
         Task<AuthResult?> AuthenticateAsync(AuthRequest request);
     }

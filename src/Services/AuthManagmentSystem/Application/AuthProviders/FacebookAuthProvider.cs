@@ -7,9 +7,9 @@ using Application.Interfaces;
 using Shared.Dtos;
 using Shared.Enums;
 
-namespace Providers
+namespace Application.AuthProviders
 {
-    public class FacebookAuthService : IAuthenticatorService
+    public class FacebookAuthProvider : IAuthenticatorService
     {
         public AuthServiceName ServiceName => AuthServiceName.Facebook;
 

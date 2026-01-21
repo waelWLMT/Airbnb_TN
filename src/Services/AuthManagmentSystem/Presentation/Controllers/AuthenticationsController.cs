@@ -11,10 +11,10 @@ namespace Presentation.Controllers
     [ApiController]
     public class AuthenticationsController : ControllerBase
     {
-        private readonly IAuthOrchestrator _authOrchestrator;
-        private readonly ITokenService _tokenService;
+        private readonly IAuthenticationManager _authOrchestrator;
+        private readonly IAuthTokenService _tokenService;
 
-        public AuthenticationsController(IAuthOrchestrator authOrchestrator, ITokenService tokenService)
+        public AuthenticationsController(IAuthenticationManager authOrchestrator, IAuthTokenService tokenService)
         {
             _authOrchestrator = authOrchestrator;
             _tokenService = tokenService;

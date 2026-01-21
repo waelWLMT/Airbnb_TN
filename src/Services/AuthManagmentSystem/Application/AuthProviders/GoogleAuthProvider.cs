@@ -7,9 +7,9 @@ using Application.Interfaces;
 using Shared.Dtos;
 using Shared.Enums;
 
-namespace Providers
+namespace Application.AuthProviders
 {
-    public class GoogleAuthService : IAuthenticatorService
+    public class GoogleAuthProvider : IAuthenticatorService
     {
         public AuthServiceName ServiceName => AuthServiceName.Google;
 

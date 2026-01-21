@@ -10,11 +10,11 @@ using Shared.Dtos;
 
 namespace Application.Services
 {
-    public class TokenService : ITokenService
+    public class AuthTokenService : IAuthTokenService
     {
         private readonly ITokenGenerator _tokenGenerator;
 
-        public TokenService(ITokenGenerator tokenGenerator)
+        public AuthTokenService(ITokenGenerator tokenGenerator)
         {
             _tokenGenerator = tokenGenerator;
         }

@@ -8,11 +8,11 @@ using Shared.Dtos;
 
 namespace Application.Services
 {
-    public class AuthOrchestrator : IAuthOrchestrator
+    public class AuthenticationManager : IAuthenticationManager
     {
         private readonly IEnumerable<IAuthenticatorService> _providers;
 
-        public AuthOrchestrator(IEnumerable<IAuthenticatorService> providers)
+        public AuthenticationManager(IEnumerable<IAuthenticatorService> providers)
         {
             _providers = providers;
         }

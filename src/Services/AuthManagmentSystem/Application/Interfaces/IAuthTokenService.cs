@@ -7,8 +7,8 @@ using Shared.Dtos;
 
 namespace Application.Interfaces
 {
-    public interface IUserManagementClient
+    public interface IAuthTokenService
     {
-        public Task<AuthResult?>ValidateCredentials(string? email, string? password, CancellationToken cancellationToken = default);
+        string GenerateToken(AuthResult user);
     }
 }

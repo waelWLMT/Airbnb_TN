@@ -4,7 +4,6 @@ using Presentation;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 // Register HttpClient
 var userServiceUrl = builder.Configuration["UserManagementService:BaseUrl"];
 
@@ -27,9 +26,6 @@ if(app.Environment.IsProduction())
 
 app.UseAuthorization();
 app.MapControllers();
-
-Console.WriteLine(builder.Environment.EnvironmentName);
-Console.WriteLine(builder.Configuration["UserManagement:BaseUrl"]);
 
 app.MapGet("/", () => "Hello World!");
 

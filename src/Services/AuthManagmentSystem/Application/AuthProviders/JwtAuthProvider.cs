@@ -4,19 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Application.Interfaces;
-using Infrastructure.Clients;
 using Shared.Dtos;
 using Shared.Enums;
 
-namespace Providers
+namespace Application.AuthProviders
 {
-    public class JwtAuthService : IAuthenticatorService
+    public class JwtAuthProvider : IAuthenticatorService
     {
         public AuthServiceName ServiceName => AuthServiceName.Jwt;
 
-        private readonly IUserManagementClient _userClient;
+        private readonly IUserManagementHttpClient _userClient;
 
-        public JwtAuthService(IUserManagementClient userManagmentClient)
+        public JwtAuthProvider(IUserManagementHttpClient userManagmentClient)
         {
             _userClient = userManagmentClient;
         }
