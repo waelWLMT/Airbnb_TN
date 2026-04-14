@@ -12,7 +12,7 @@ namespace Infrastructure
 {
     public static class DependencyInjection
     {
-        public static void InjectInfrastructure(this IServiceCollection services, string connectionString)
+        public static void RegisterInfrastructure(this IServiceCollection services, string connectionString)
         {
             services.AddDbContext<UsersDbContext>(options =>
             {

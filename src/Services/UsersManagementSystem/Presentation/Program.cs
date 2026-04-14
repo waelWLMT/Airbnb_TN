@@ -1,12 +1,18 @@
 using Application;
 using Infrastructure;
+using Messaging;
 
 var builder = WebApplication.CreateBuilder(args);
+var RabbiMQConfig = builder.Configuration.GetSection("RabbitMQ");
 
 // Register sevices from infrastructure
-builder.Services.InjectInfrastructure(builder.Configuration.GetConnectionString("UserDbCnx")!);
+builder.Services.RegisterInfrastructure(builder.Configuration.GetConnectionString("UserDbCnx")!);
+
 // Register services from application
-builder.Services.InjectApplication();
+builder.Services.RegisterApplication();
+
+// Register Messaging services
+builder.Services.RegisterMessaging(RabbiMQConfig);
 
 // Register MediatR
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
@@ -38,32 +44,7 @@ if (app.Environment.IsProduction())
     app.UseHttpsRedirection();
 }
 
-
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
-
-
 app.Run();
 
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
 

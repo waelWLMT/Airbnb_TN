@@ -11,6 +11,6 @@ namespace Application.UseCases.Commands
 {
     public class CreateUserCommand : IRequest<User>
     {
-        public required UserCreateDto? UserCreateDto { get; set; }
+        public required UserCreateDto UserCreateDto { get; set; }
     }
 }

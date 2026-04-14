@@ -8,6 +8,7 @@ using Application.UseCases.Commands;
 using Application.UseCases.Handlers;
 using Domain.Interfaces;
 using Domain.Models;
+using MassTransit;
 using Moq;
 using Tests.Helpers;
 
@@ -16,13 +17,15 @@ namespace Tests.ApplicationTests.HandlerTests
     public class CreateUserCommandHandlerTests
     {
         private readonly Mock<IUnitOfWork> _moqUnitOfWork;
-        private readonly Mock<IUserWriteRepository> _moqUserWriteRepository;        
+        private readonly Mock<IUserWriteRepository> _moqUserWriteRepository;
+        private readonly Mock<IPublishEndpoint> _moqPublishEndPoint;
 
         public CreateUserCommandHandlerTests()
         {
             _moqUnitOfWork = new Mock<IUnitOfWork>();
             _moqUserWriteRepository = new Mock<IUserWriteRepository>();
-            
+            _moqPublishEndPoint = new Mock<IPublishEndpoint>();
+
         }
 
         [Fact]
@@ -43,7 +46,7 @@ namespace Tests.ApplicationTests.HandlerTests
                 .Returns(Task.CompletedTask);
 
             var command = new CreateUserCommand() { UserCreateDto = userCreateDto };
-            var handler = new CreateUserCommandHandler(_moqUnitOfWork.Object);
+            var handler = new CreateUserCommandHandler(_moqUnitOfWork.Object, _moqPublishEndPoint.Object);
 
             // Act  
             var result = await handler.Handle(command, CancellationToken.None);
@@ -78,7 +81,7 @@ namespace Tests.ApplicationTests.HandlerTests
                 .Returns(_moqUserWriteRepository.Object);
 
             var command = new CreateUserCommand() { UserCreateDto = userCreateDto };
-            var handler = new CreateUserCommandHandler(_moqUnitOfWork.Object);
+            var handler = new CreateUserCommandHandler(_moqUnitOfWork.Object, _moqPublishEndPoint.Object);
            
             // Act & Assert
             var exception = await Assert.ThrowsAsync<ArgumentNullException>(() => handler.Handle(command, CancellationToken.None));

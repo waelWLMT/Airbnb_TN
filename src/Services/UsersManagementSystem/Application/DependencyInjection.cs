@@ -10,7 +10,7 @@ namespace Application
 {
     public static class DependencyInjection
     {
-        public static void InjectApplication(this IServiceCollection services)
+        public static void RegisterApplication(this IServiceCollection services)
         {
             services.AddMediatR(cf => cf.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly));
         }
