@@ -17,14 +17,14 @@ namespace Application.UseCases.Handlers
     {
         private readonly IUserReadRepository _userReadRepository;
 
-        public GetUserByEmailAndPasswordQueryHandler(IUnitOfWork unitOfWork)
+        public GetUserByEmailAndPasswordQueryHandler(IUserReadRepository userReadRepository)
         {
-            _userReadRepository = unitOfWork.GetRequiredRepository<IUserReadRepository>();
+            _userReadRepository = userReadRepository;
         }
         public async Task<User?> Handle(GetUserByEmailAndPasswordQuery request, CancellationToken cancellationToken)
         {
 
-            var findOptions = new FindOptions()
+            var findOptions = new FindOptions<User>()
                 .BuildFindOptions(
                 u => u.Email == request.Email,
                 false,

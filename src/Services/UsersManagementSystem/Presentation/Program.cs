@@ -1,9 +1,24 @@
 using Application;
 using Infrastructure;
-using Messaging;
+using MassTransit;
 
 var builder = WebApplication.CreateBuilder(args);
 var RabbiMQConfig = builder.Configuration.GetSection("RabbitMQ");
+
+// Add services to the container.
+
+// Register Messaging services
+builder.Services.AddMassTransit(x =>
+{
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host(RabbiMQConfig["Host"], "/", h =>
+        {
+            h.Username(RabbiMQConfig["Username"]);
+            h.Password(RabbiMQConfig["Password"]);
+        });
+    });
+});
 
 // Register sevices from infrastructure
 builder.Services.RegisterInfrastructure(builder.Configuration.GetConnectionString("UserDbCnx")!);
@@ -11,19 +26,11 @@ builder.Services.RegisterInfrastructure(builder.Configuration.GetConnectionStrin
 // Register services from application
 builder.Services.RegisterApplication();
 
-// Register Messaging services
-builder.Services.RegisterMessaging(RabbiMQConfig);
-
 // Register MediatR
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
-
 // addControllers
 builder.Services.AddControllers();
-
 // Add swagger generator
 builder.Services.AddSwaggerGen();
 
@@ -32,7 +39,6 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
     app.UseSwagger();
     app.UseSwaggerUI();
 }

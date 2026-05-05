@@ -8,24 +8,8 @@ using Domain.Models;
 
 namespace Infrastructure.Repositories
 {
-    public class UserWriteRepository : IUserWriteRepository
+    public class UserWriteRepository : Repository<User>, IUserWriteRepository
     {
-        protected readonly UsersDbContext _context;    
-        public UserWriteRepository(UsersDbContext context)
-        {
-            _context = context;            
-        }
-        public async Task AddAsync(User user, CancellationToken ct = default)
-        {
-            await _context.Users.AddAsync(user, ct);
-        }
-        public async Task DeleteAsync(User user, CancellationToken ct = default)
-        {
-            await Task.Run(() => _context.Users.Remove(user), ct);
-        }       
-        public async Task UpdateAsync(User user, CancellationToken ct = default)
-        {
-            await Task.Run(() => _context.Users.Update(user), ct);
-        }
+        public UserWriteRepository(UsersDbContext context) : base(context)  {  }
     }
 }

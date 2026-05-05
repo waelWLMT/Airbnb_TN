@@ -14,9 +14,9 @@ namespace Application.UseCases.Handlers
     {
         private readonly IUserReadRepository _userReadRepository;
 
-        public GetUserByIdQueryHandler(IUnitOfWork unitOfWork)
+        public GetUserByIdQueryHandler(IUserReadRepository userReadRepository)
         {
-            _userReadRepository = unitOfWork.GetRequiredRepository<IUserReadRepository>();
+            _userReadRepository = userReadRepository;
         }
         public async Task<User?> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
         {

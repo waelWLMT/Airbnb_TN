@@ -9,17 +9,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories
 {
-    public class RoleReadRepository : IRoleReadRepository
+    public class RoleReadRepository : ReadRepository<Role>, IRoleReadRepository
     {
-        private readonly UsersDbContext _context;
-
-        public RoleReadRepository(UsersDbContext usersDbContext)
+        public RoleReadRepository(UsersDbContext context) : base(context)
         {
-            _context = usersDbContext;
-        }
-        public async Task<List<Role>?> GetAllRolesAsync(CancellationToken cancellationToken)
-        {
-            return await _context.Roles.ToListAsync(cancellationToken);
         }
     }
 }

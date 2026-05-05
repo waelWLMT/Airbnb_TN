@@ -13,19 +13,15 @@ namespace Infrastructure
     {
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
-
+        public DbSet<OutboxMessage> OutboxMessages { get; set; }
         public UsersDbContext(DbContextOptions<UsersDbContext> dbContextOptions)
         : base(dbContextOptions)
         {
         }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.ApplyConfiguration(new RoleConfiguration());
-            modelBuilder.ApplyConfiguration(new UserConfiguration());
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(UsersDbContext).Assembly);
         }
-
-
     }
 
 }

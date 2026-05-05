@@ -53,6 +53,20 @@ namespace WebApi.Controllers
 
         }
 
+        [HttpGet("ActivateUserById")]
+        public async Task<bool> ActivateUser(Guid id, bool isActive)
+        {
+            var command = new ActivateUserCommand()
+            {
+                Id = id,
+                ActivateUser = isActive
+            };
+
+            var result = await _mediator.Send(command);
+
+            return result;
+        }
+
         [HttpPost("CreateUser")]
         public async Task<UserReadDto?> CreateUser(UserCreateDto userCreateDto)
         {
@@ -96,7 +110,6 @@ namespace WebApi.Controllers
             return UserBuilderService.BuildUserReadDto(user);
 
         }
-
        
         [HttpPost("ValidateCredentials")]
         public async Task<ActionResult<AuthResult>> ValidateCredentials(AuthCredentialsData authCredentialsData)

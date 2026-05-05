@@ -8,6 +8,7 @@ using Application.UseCases.Commands;
 using Application.UseCases.Handlers;
 using Domain.Interfaces;
 using Domain.Models;
+using Infrastructure.Repositories;
 using MassTransit;
 using Moq;
 using Tests.Helpers;
@@ -18,14 +19,13 @@ namespace Tests.ApplicationTests.HandlerTests
     {
         private readonly Mock<IUnitOfWork> _moqUnitOfWork;
         private readonly Mock<IUserWriteRepository> _moqUserWriteRepository;
-        private readonly Mock<IPublishEndpoint> _moqPublishEndPoint;
+        private readonly Mock<IOutboxMessageRepository> _moqOutBoxMessageRepository;
 
         public CreateUserCommandHandlerTests()
         {
             _moqUnitOfWork = new Mock<IUnitOfWork>();
             _moqUserWriteRepository = new Mock<IUserWriteRepository>();
-            _moqPublishEndPoint = new Mock<IPublishEndpoint>();
-
+            _moqOutBoxMessageRepository = new Mock<IOutboxMessageRepository>();
         }
 
         [Fact]
@@ -37,16 +37,19 @@ namespace Tests.ApplicationTests.HandlerTests
             _moqUserWriteRepository
                 .Setup(repo => repo.AddAsync(It.IsAny<User>(), It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
-
-            _moqUnitOfWork.Setup(uow => uow.GetRequiredRepository<IUserWriteRepository>())
-                .Returns(_moqUserWriteRepository.Object);
-
+            
             _moqUnitOfWork
                 .Setup(uow => uow.CommitAsync(It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
             var command = new CreateUserCommand() { UserCreateDto = userCreateDto };
-            var handler = new CreateUserCommandHandler(_moqUnitOfWork.Object, _moqPublishEndPoint.Object);
+            
+            var handler = new CreateUserCommandHandler
+                (
+                _moqUnitOfWork.Object,
+                _moqUserWriteRepository.Object, 
+                _moqOutBoxMessageRepository.Object
+                );            
 
             // Act  
             var result = await handler.Handle(command, CancellationToken.None);
@@ -77,11 +80,15 @@ namespace Tests.ApplicationTests.HandlerTests
                 .Setup(uow => uow.CommitAsync(It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
-            _moqUnitOfWork.Setup(uow => uow.GetRequiredRepository<IUserWriteRepository>())
-                .Returns(_moqUserWriteRepository.Object);
-
             var command = new CreateUserCommand() { UserCreateDto = userCreateDto };
-            var handler = new CreateUserCommandHandler(_moqUnitOfWork.Object, _moqPublishEndPoint.Object);
+            
+            var handler = new CreateUserCommandHandler
+                (
+                _moqUnitOfWork.Object,
+                _moqUserWriteRepository.Object, 
+                _moqOutBoxMessageRepository.Object
+                );
+            
            
             // Act & Assert
             var exception = await Assert.ThrowsAsync<ArgumentNullException>(() => handler.Handle(command, CancellationToken.None));

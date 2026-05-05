@@ -17,12 +17,14 @@ namespace Tests.ApplicationTests.HandlerTests
         private readonly Mock<IUnitOfWork> _moqUnitOfWork;
         private readonly Mock<IUserWriteRepository> _moqUserWriteRepository;
         private readonly Mock<IUserReadRepository> _moqUserReadRepository;
+        private readonly Mock<IOutboxMessageRepository> _moqOutBoxMessage;
 
         public DeleteUserCommandHandlerTests()
         {
             _moqUnitOfWork = new Mock<IUnitOfWork>();
             _moqUserWriteRepository = new Mock<IUserWriteRepository>();
             _moqUserReadRepository = new Mock<IUserReadRepository>();
+            _moqOutBoxMessage = new Mock<IOutboxMessageRepository>();
         }
 
         [Fact]
@@ -38,18 +40,19 @@ namespace Tests.ApplicationTests.HandlerTests
                 .Setup(repo => repo.DeleteAsync(It.IsAny<User>(), It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
-            _moqUnitOfWork.Setup(uow => uow.GetRequiredRepository<IUserWriteRepository>())
-                .Returns(_moqUserWriteRepository.Object);
-
-            _moqUnitOfWork.Setup(uow => uow.GetRequiredRepository<IUserReadRepository>())
-                .Returns(_moqUserReadRepository.Object);
-
             _moqUnitOfWork
                 .Setup(uow => uow.CommitAsync(It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
             var command = new DeleteUserCommand() { Id = user.Id };
-            var handler = new DeleteUserCommandHandler(_moqUnitOfWork.Object);
+           
+            var handler = new DeleteUserCommandHandler
+                (
+                _moqUnitOfWork.Object,
+                _moqUserReadRepository.Object,
+                _moqUserWriteRepository.Object,
+                _moqOutBoxMessage.Object
+                );            
 
             // Act  
             var result = await handler.Handle(command, CancellationToken.None);
@@ -74,14 +77,16 @@ namespace Tests.ApplicationTests.HandlerTests
             _moqUserReadRepository.Setup(repo => repo.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((User?)null);            
 
-            _moqUnitOfWork.Setup(uow => uow.GetRequiredRepository<IUserWriteRepository>())
-                .Returns(_moqUserWriteRepository.Object);
-
-            _moqUnitOfWork.Setup(uow => uow.GetRequiredRepository<IUserReadRepository>())
-                .Returns(_moqUserReadRepository.Object);
 
             var command = new DeleteUserCommand() { Id = Guid.NewGuid() };
-            var handler = new DeleteUserCommandHandler(_moqUnitOfWork.Object);
+            
+            var handler = new DeleteUserCommandHandler
+                (
+                _moqUnitOfWork.Object,
+                _moqUserReadRepository.Object,
+                _moqUserWriteRepository.Object,
+                _moqOutBoxMessage.Object
+                );           
 
             // Act & Assert
             await Assert.ThrowsAsync<KeyNotFoundException>(() => handler.Handle(command, CancellationToken.None));

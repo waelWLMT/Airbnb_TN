@@ -7,8 +7,6 @@ using Application.Services;
 using Application.UseCases.Commands;
 using Domain.Interfaces;
 using Domain.Models;
-using Infrastructure;
-using Infrastructure.Repositories;
 using MediatR;
 
 namespace Application.UseCases.Handlers
@@ -19,11 +17,11 @@ namespace Application.UseCases.Handlers
         private readonly IUserWriteRepository _userWriteRepository;
         private readonly IUserReadRepository _userReadRepository;
 
-        public UpdateUserCommandHandler(IUnitOfWork unitOfwork)
+        public UpdateUserCommandHandler(IUnitOfWork unitOfwork, IUserWriteRepository userWriteRepository, IUserReadRepository userReadRepository)
         {
             _unitOfWork = unitOfwork;
-            _userWriteRepository = _unitOfWork.GetRequiredRepository<IUserWriteRepository>();
-            _userReadRepository = _unitOfWork.GetRequiredRepository<IUserReadRepository>();
+            _userWriteRepository = userWriteRepository;
+            _userReadRepository = userReadRepository;
         }
         public async Task<User?> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
         {
@@ -36,7 +34,6 @@ namespace Application.UseCases.Handlers
             setUserToUpdate(userToUpdate, request.UserUpdateDto);
             await _userWriteRepository.UpdateAsync(userToUpdate, cancellationToken);
             await _unitOfWork.CommitAsync(cancellationToken);
-
 
             return userToUpdate;
 

@@ -7,7 +7,6 @@ using Application.UseCases.Queries;
 using Domain.Interfaces;
 using Domain.Models;
 using Domain.Utils;
-using Infrastructure;
 using MediatR;
 
 namespace Application.UseCases.Handlers
@@ -16,14 +15,14 @@ namespace Application.UseCases.Handlers
     {
         private readonly IUserReadRepository _userReadRepositroy;
 
-        public GetAllUsersQueryHandler(IUnitOfWork unitOfWork)
+        public GetAllUsersQueryHandler(IUserReadRepository userReadRepositroy)
         {
-            _userReadRepositroy = unitOfWork.GetRequiredRepository<IUserReadRepository>();
+            _userReadRepositroy = userReadRepositroy;
         }
         public async Task<List<User>> Handle(GetAllUsersQuery request, CancellationToken cancellationToken)
         {
 
-            var findOptions = new FindOptions
+            var findOptions = new FindOptions<User>
             {
                 IsAsNoTracking = request.IsReadOnly,
                 Includes = request.UserWithRole

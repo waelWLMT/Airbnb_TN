@@ -8,21 +8,19 @@ using Domain.Models;
 
 namespace Domain.Utils
 {
-    public class FindOptions
+    public class FindOptions<T> where T : class
     {
-        public Expression<Func<User, bool>>? Predicate { get; set; }
+        public Expression<Func<T, bool>>? Predicate { get; set; }
         public bool IsAsNoTracking { get; set; } = false;
-        public Expression<Func<User, object>>[]? Includes { get; set; } = Array.Empty<Expression<Func<User, object>>>();
-        
-        public FindOptions BuildFindOptions(Expression<Func<User, bool>> predicate, bool isAsNoTracking = false, params Expression<Func<User, object>>[] includes)
+        public Expression<Func<T, object>>[]? Includes { get; set; } = Array.Empty<Expression<Func<T, object>>>();        
+        public FindOptions<T> BuildFindOptions(Expression<Func<T, bool>> predicate, bool isAsNoTracking = false, params Expression<Func<T, object>>[] includes)
         {
-            return new FindOptions()
+            return new FindOptions<T>()
             {
                 Predicate = predicate,
                 IsAsNoTracking = isAsNoTracking,
                 Includes = includes                
             };
         }
-
     }
 }

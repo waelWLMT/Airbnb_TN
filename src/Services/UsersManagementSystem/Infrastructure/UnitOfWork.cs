@@ -13,24 +13,14 @@ namespace Infrastructure
     public class UnitOfWork : IUnitOfWork
     {
         private readonly UsersDbContext _context;
-        private readonly IServiceProvider _serviceProvider;
-
-        public UnitOfWork(UsersDbContext context, IServiceProvider serviceProvider)
+        public UnitOfWork(UsersDbContext context)
         {
             _context = context;
-            _serviceProvider = serviceProvider;
         }
         public async Task CommitAsync(CancellationToken ct = default)
         {
             await _context.SaveChangesAsync(ct);
         }
-
-        public T GetRequiredRepository<T>()
-        {     
-            return (T) _serviceProvider.GetRequiredService<T>() 
-                ?? throw new InvalidOperationException($"Repository {nameof(T)} not found");
-        }
-
         public async Task RollBackAsync(CancellationToken ct = default)
         {
             await _context.DisposeAsync();

@@ -14,12 +14,12 @@ namespace Tests.ApplicationTests.HandlerTests
 {
     public class GetUserByIdQueryHandlerTests
     {
-        private readonly Mock<IUnitOfWork> _moqUnitOfWork;
+        
         private readonly Mock<IUserReadRepository> _moqUserReadRepository;
 
         public GetUserByIdQueryHandlerTests()
         {
-            _moqUnitOfWork = new Mock<IUnitOfWork>();
+         
             _moqUserReadRepository = new Mock<IUserReadRepository>();
         }
 
@@ -34,12 +34,8 @@ namespace Tests.ApplicationTests.HandlerTests
                 .Setup(repo => repo.GetByIdAsync(userId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(expectedUser);
 
-            _moqUnitOfWork
-                .Setup(uow => uow.GetRequiredRepository<IUserReadRepository>())
-                .Returns(_moqUserReadRepository.Object);
-
             var query = new GetUserByIdQuery() { Id = userId };
-            var handler = new GetUserByIdQueryHandler(_moqUnitOfWork.Object);
+            var handler = new GetUserByIdQueryHandler(_moqUserReadRepository.Object);
 
             // Act
             var result = await handler.Handle(query, CancellationToken.None);
@@ -48,10 +44,7 @@ namespace Tests.ApplicationTests.HandlerTests
             Assert.NotNull(result);
             Assert.Equal(expectedUser.Id, result!.Id);
             Assert.Equal(expectedUser.Email, result.Email);
-
-            _moqUnitOfWork
-                .Verify(uow => uow.GetRequiredRepository<IUserReadRepository>(), Times.Once);
-
+        
             _moqUserReadRepository
                 .Verify(repo => repo.GetByIdAsync(userId, It.IsAny<CancellationToken>()), Times.Once);
 
@@ -66,21 +59,16 @@ namespace Tests.ApplicationTests.HandlerTests
                 .Setup(repo => repo.GetByIdAsync(userId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync((User?)null);
 
-            _moqUnitOfWork
-                .Setup(uow => uow.GetRequiredRepository<IUserReadRepository>())
-                .Returns(_moqUserReadRepository.Object);
+           
 
             var query = new GetUserByIdQuery() { Id = userId };
-            var handler = new GetUserByIdQueryHandler(_moqUnitOfWork.Object);
+            var handler = new GetUserByIdQueryHandler(_moqUserReadRepository.Object);
             
             // Act
             var result = await handler.Handle(query, CancellationToken.None);
             
             // Assert
             Assert.Null(result);
-            
-            _moqUnitOfWork
-                .Verify(uow => uow.GetRequiredRepository<IUserReadRepository>(), Times.Once);
             
             _moqUserReadRepository
                 .Verify(repo => repo.GetByIdAsync(userId, It.IsAny<CancellationToken>()), Times.Once);

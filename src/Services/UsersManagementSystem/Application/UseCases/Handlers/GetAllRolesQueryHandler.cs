@@ -7,7 +7,6 @@ using Application.Dtos;
 using Application.UseCases.Queries;
 using Domain.Interfaces;
 using Domain.Models;
-using Infrastructure.Repositories;
 using MediatR;
 
 namespace Application.UseCases.Handlers
@@ -16,13 +15,14 @@ namespace Application.UseCases.Handlers
     {
         private readonly IRoleReadRepository _roleReadRepository;
 
-        public GetAllRolesQueryHandler(IUnitOfWork unitOfWork)
+        public GetAllRolesQueryHandler(IRoleReadRepository roleReadRepository)
         {
-            _roleReadRepository = unitOfWork.GetRequiredRepository<IRoleReadRepository>();
+            _roleReadRepository = roleReadRepository;
         }
         public async Task<List<Role>?> Handle(GetAllRolesQuery request, CancellationToken cancellationToken)
         {
-            return await _roleReadRepository.GetAllRolesAsync(cancellationToken);
+            var roles = await _roleReadRepository.ListAsync(cancellationToken, false);
+            return roles.ToList();
         }
     }
 }

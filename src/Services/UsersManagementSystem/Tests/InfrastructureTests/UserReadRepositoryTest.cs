@@ -101,7 +101,7 @@ namespace Tests.InfrastructureTests
             var userEmail = users[0].Email;
 
             // Act
-            var result = await userReadRepository.GetOneAsync(CancellationToken.None, new FindOptions
+            var result = await userReadRepository.GetOneAsync(CancellationToken.None, new FindOptions<User>
             {
                 Predicate = u => u.Email == userEmail,
                 Includes = new System.Linq.Expressions.Expression<Func<Domain.Models.User, object>>[] { x => x.UserRole },
@@ -120,7 +120,7 @@ namespace Tests.InfrastructureTests
             var userReadRepository = new UserReadRepository(_dbContext);
 
             // act
-            var result = await userReadRepository.GetOneAsync(It.IsAny<CancellationToken>(), It.IsAny<FindOptions>());
+            var result = await userReadRepository.GetOneAsync(It.IsAny<CancellationToken>(), It.IsAny<FindOptions<User>>());
 
             // Assert
             Assert.Null(result);
@@ -138,7 +138,7 @@ namespace Tests.InfrastructureTests
            
             
             // Act
-            var result = await userReadRepository.GetAllAsync(CancellationToken.None, new FindOptions
+            var result = await userReadRepository.GetAllAsync(CancellationToken.None, new FindOptions<User>
             {
                 Includes = new Expression<Func<User, object>>[] { x => x.UserRole },
             });

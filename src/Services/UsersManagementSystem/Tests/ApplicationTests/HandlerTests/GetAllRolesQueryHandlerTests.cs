@@ -13,12 +13,12 @@ namespace Tests.ApplicationTests.HandlerTests
     public class GetAllRolesQueryHandlerTests
     {
         private readonly Mock<IRoleReadRepository> _moqUserReadRepository;
-        private readonly Mock<IUnitOfWork> _moqUnitOfWork;
+        
 
         public GetAllRolesQueryHandlerTests()
         {
             _moqUserReadRepository = new Mock<IRoleReadRepository>();
-            _moqUnitOfWork = new Mock<IUnitOfWork>();
+           
         }
 
         [Fact]
@@ -26,16 +26,14 @@ namespace Tests.ApplicationTests.HandlerTests
         {
             // Arrange
             var expectedRoles = RolesTestData.GetSampleRoles();
-
+                        
             _moqUserReadRepository
-                .Setup(repo => repo.GetAllRolesAsync(It.IsAny<CancellationToken>()))
+                .Setup(repo => repo.ListAsync(It.IsAny<CancellationToken>(), false))
                 .ReturnsAsync(expectedRoles);
 
-            _moqUnitOfWork
-                .Setup(uow => uow.GetRequiredRepository<IRoleReadRepository>())
-                .Returns(_moqUserReadRepository.Object);
             
-            var handler = new Application.UseCases.Handlers.GetAllRolesQueryHandler(_moqUnitOfWork.Object);
+            
+            var handler = new Application.UseCases.Handlers.GetAllRolesQueryHandler(_moqUserReadRepository.Object);
             var query = new Application.UseCases.Queries.GetAllRolesQuery();
            
             // Act

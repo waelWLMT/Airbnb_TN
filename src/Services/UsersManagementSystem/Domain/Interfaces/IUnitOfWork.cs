@@ -10,6 +10,5 @@ namespace Domain.Interfaces
     {
         public Task CommitAsync(CancellationToken ct = default);
         public Task RollBackAsync(CancellationToken ct = default);
-        public T GetRequiredRepository<T>();
     }
 }

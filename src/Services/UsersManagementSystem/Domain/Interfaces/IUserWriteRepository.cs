@@ -7,10 +7,8 @@ using Domain.Models;
 
 namespace Domain.Interfaces
 {
-    public interface IUserWriteRepository
+    public interface IUserWriteRepository : IRepository<User>
     {
-        public Task AddAsync(User user, CancellationToken ct = default);
-        public Task DeleteAsync(User user, CancellationToken ct = default);        
-        public Task UpdateAsync(User user, CancellationToken ct = default);
+       
     }
 }

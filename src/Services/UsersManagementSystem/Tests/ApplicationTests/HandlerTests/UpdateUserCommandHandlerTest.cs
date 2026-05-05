@@ -37,20 +37,19 @@ namespace Tests.ApplicationTests.HandlerTests
             _moqUserWriteRepository.Setup(repo => repo.UpdateAsync(It.IsAny<Domain.Models.User>(), It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
-            _moqUnitOfWork.Setup(uow => uow.GetRequiredRepository<IUserReadRepository>())
-                .Returns(_moqUserReadRepository.Object);
-
-            _moqUnitOfWork.Setup(uow => uow.GetRequiredRepository<IUserWriteRepository>())
-                .Returns(_moqUserWriteRepository.Object);
-
-
             var command = new UpdateUserCommand
             {
                 Id = Guid.NewGuid(),
                 UserUpdateDto = userToUpdate
             };
-
-            var handler = new UpdateUserCommandHandler(_moqUnitOfWork.Object);
+            
+            var handler = new UpdateUserCommandHandler
+                (
+                _moqUnitOfWork.Object,
+                _moqUserWriteRepository.Object, 
+                _moqUserReadRepository.Object
+                );
+            
 
             // Act
             var result = await handler.Handle(command, CancellationToken.None);
@@ -76,17 +75,19 @@ namespace Tests.ApplicationTests.HandlerTests
             _moqUserReadRepository.Setup(repo => repo.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((User?)null);
 
-            _moqUnitOfWork.Setup(uow => uow.GetRequiredRepository<IUserReadRepository>())
-                .Returns(_moqUserReadRepository.Object);
-            
             var command = new UpdateUserCommand
             {
                 Id = Guid.NewGuid(),
                 UserUpdateDto = UsersTestData.GetFakeUserUpdateDto()
             };
 
-            var handler = new UpdateUserCommandHandler(_moqUnitOfWork.Object);
-           
+            var handler = new UpdateUserCommandHandler
+                (
+                _moqUnitOfWork.Object,
+                _moqUserWriteRepository.Object, 
+                _moqUserReadRepository.Object
+                );
+
             // Act & Assert
             await Assert.ThrowsAsync<KeyNotFoundException>(() => handler.Handle(command, CancellationToken.None));
             

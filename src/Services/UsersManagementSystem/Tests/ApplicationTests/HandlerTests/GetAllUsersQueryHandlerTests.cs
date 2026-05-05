@@ -15,12 +15,12 @@ namespace Tests.ApplicationTests.HandlerTests
     public class GetAllUsersQueryHandlerTests
     {
         private readonly Mock<IUserReadRepository> _moqReadRepository;
-        private readonly Mock<IUnitOfWork> _moqUnitOfWork;
+       
 
         public GetAllUsersQueryHandlerTests()
         {
             _moqReadRepository = new Mock<IUserReadRepository>();
-            _moqUnitOfWork = new Mock<IUnitOfWork>();
+           
         }
 
         [Fact]
@@ -30,14 +30,12 @@ namespace Tests.ApplicationTests.HandlerTests
             var expectedUsers = UsersTestData.GetSamplesUsers();
 
             _moqReadRepository
-                .Setup(repo => repo.GetAllAsync(It.IsAny<CancellationToken>(), It.IsAny<FindOptions?>()))
+                .Setup(repo => repo.GetAllAsync(It.IsAny<CancellationToken>(), It.IsAny<FindOptions<User>?>()))
                 .ReturnsAsync(expectedUsers);
 
-            _moqUnitOfWork
-                .Setup(uow => uow.GetRequiredRepository<IUserReadRepository>())
-                .Returns(_moqReadRepository.Object);
+          
 
-            var handler = new Application.UseCases.Handlers.GetAllUsersQueryHandler(_moqUnitOfWork.Object);
+            var handler = new Application.UseCases.Handlers.GetAllUsersQueryHandler(_moqReadRepository.Object);
 
             var query = new Application.UseCases.Queries.GetAllUsersQuery
             {
@@ -54,7 +52,7 @@ namespace Tests.ApplicationTests.HandlerTests
             Assert.Equal(expectedUsers, result);
 
             _moqReadRepository
-                .Verify(repo => repo.GetAllAsync(It.IsAny<CancellationToken>(), It.IsAny<FindOptions?>()), Times.Once);
+                .Verify(repo => repo.GetAllAsync(It.IsAny<CancellationToken>(), It.IsAny<FindOptions<User>?>()), Times.Once);
         }
 
         [Fact]
@@ -62,14 +60,11 @@ namespace Tests.ApplicationTests.HandlerTests
         {
             // Arrange
             _moqReadRepository
-                .Setup(repo => repo.GetAllAsync(It.IsAny<CancellationToken>(), It.IsAny<FindOptions?>()))
+                .Setup(repo => repo.GetAllAsync(It.IsAny<CancellationToken>(), It.IsAny<FindOptions<User>?>()))
                 .ReturnsAsync(new List<User>());
+          
 
-            _moqUnitOfWork
-                .Setup(uow => uow.GetRequiredRepository<IUserReadRepository>())
-                .Returns(_moqReadRepository.Object);
-
-            var handler = new Application.UseCases.Handlers.GetAllUsersQueryHandler(_moqUnitOfWork.Object);
+            var handler = new Application.UseCases.Handlers.GetAllUsersQueryHandler(_moqReadRepository.Object);
 
             var query = new Application.UseCases.Queries.GetAllUsersQuery
             {
@@ -85,7 +80,7 @@ namespace Tests.ApplicationTests.HandlerTests
             Assert.Empty(result!);
 
             _moqReadRepository
-                .Verify(repo => repo.GetAllAsync(It.IsAny<CancellationToken>(), It.IsAny<FindOptions?>()), Times.Once);
+                .Verify(repo => repo.GetAllAsync(It.IsAny<CancellationToken>(), It.IsAny<FindOptions<User>?>()), Times.Once);
         }
     }
 }

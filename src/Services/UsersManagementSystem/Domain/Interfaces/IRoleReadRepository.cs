@@ -7,8 +7,7 @@ using Domain.Models;
 
 namespace Domain.Interfaces
 {
-    public interface IRoleReadRepository
-    {
-        public Task<List<Role>?> GetAllRolesAsync(CancellationToken cancellationToken);
+    public interface IRoleReadRepository : IReadRepository<Role>
+    {        
     }
 }

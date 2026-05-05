@@ -17,12 +17,12 @@ namespace Tests.ApplicationTests.HandlerTests
     public class GetUserByEmailAndPasswordQueryHandlerTests
     {
         private readonly Mock<IUserReadRepository> _moqUserReadRepository;
-        private readonly Mock<IUnitOfWork> _moqUnitOfWork;
+      
 
         public GetUserByEmailAndPasswordQueryHandlerTests()
         {
             _moqUserReadRepository = new Mock<IUserReadRepository>();
-            _moqUnitOfWork = new Mock<IUnitOfWork>();
+           
         }
 
         [Fact]
@@ -39,25 +39,20 @@ namespace Tests.ApplicationTests.HandlerTests
             users[0].PasswordHash = PasswordService.HashPassword(query.Password);
 
             _moqUserReadRepository
-                .Setup(repo => repo.GetAllAsync(It.IsAny<CancellationToken>(), It.IsAny<FindOptions?>()))
+                .Setup(repo => repo.GetAllAsync(It.IsAny<CancellationToken>(), It.IsAny<FindOptions<User>?>()))
                 .ReturnsAsync(users);
 
-            _moqUnitOfWork.Setup(uow => uow.GetRequiredRepository<IUserReadRepository>())
-                .Returns(_moqUserReadRepository.Object);
-
             // Act
-            var handler = new GetUserByEmailAndPasswordQueryHandler(_moqUnitOfWork.Object);
+            var handler = new GetUserByEmailAndPasswordQueryHandler(_moqUserReadRepository.Object);
             var result = await handler.Handle(query, CancellationToken.None);
 
             // Assert
             Assert.NotNull(result);
             Assert.Equal(query.Email, result!.Email);           
 
-            _moqUnitOfWork
-                .Verify(uow => uow.GetRequiredRepository<IUserReadRepository>(), Times.Once);
-
+           
             _moqUserReadRepository
-                .Verify(repo => repo.GetAllAsync(It.IsAny<CancellationToken>(), It.IsAny<FindOptions?>()), Times.Once);
+                .Verify(repo => repo.GetAllAsync(It.IsAny<CancellationToken>(), It.IsAny<FindOptions<User>?>()), Times.Once);
 
         }
 
@@ -74,26 +69,19 @@ namespace Tests.ApplicationTests.HandlerTests
             var users = new List<User>();
 
             _moqUserReadRepository
-                .Setup(repo => repo.GetAllAsync(It.IsAny<CancellationToken>(), It.IsAny<FindOptions?>()))
+                .Setup(repo => repo.GetAllAsync(It.IsAny<CancellationToken>(), It.IsAny<FindOptions<User>?>()))
                 .ReturnsAsync(users);
-
-            _moqUnitOfWork
-                .Setup(uow => uow.GetRequiredRepository<IUserReadRepository>())
-                .Returns(_moqUserReadRepository.Object);
-
             
-            var handler = new GetUserByEmailAndPasswordQueryHandler(_moqUnitOfWork.Object);
+            var handler = new GetUserByEmailAndPasswordQueryHandler(_moqUserReadRepository.Object);
 
             // Act
             var result = await handler.Handle(query, CancellationToken.None);
 
             // Assert
             Assert.Null(result);
-            _moqUnitOfWork
-                .Verify(uow => uow.GetRequiredRepository<IUserReadRepository>(), Times.Once);
-            
+          
             _moqUserReadRepository
-                .Verify(repo => repo.GetAllAsync(It.IsAny<CancellationToken>(), It.IsAny<FindOptions?>()), Times.Once);
+                .Verify(repo => repo.GetAllAsync(It.IsAny<CancellationToken>(), It.IsAny<FindOptions<User>?>()), Times.Once);
 
         }
     }
