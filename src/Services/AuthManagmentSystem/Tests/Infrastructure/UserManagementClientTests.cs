@@ -11,7 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Tests.Infrastructure.Clients
+namespace UnitTests.Infrastructure.Clients
 {
     public class UserManagementClientTests
     {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Application.Dtos;
 using Domain.Models;
 
-namespace Tests.Helpers
+namespace UnitTests.Helpers
 {
     public static class UsersTestData
     {

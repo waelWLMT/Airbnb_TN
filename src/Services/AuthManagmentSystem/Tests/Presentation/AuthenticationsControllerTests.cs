@@ -10,7 +10,7 @@ using Moq;
 using Presentation.Controllers;
 using Shared.Dtos;
 
-namespace Tests.Presentation
+namespace UnitTests.Presentation
 {
     
         public class AuthenticationsControllerTests

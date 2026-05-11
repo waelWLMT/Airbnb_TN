@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Application.UseCases.Commands;
 using Application.UseCases.Validators;
 
-namespace Tests.ApplicationTests.ValidatorTest
+namespace UnitTests.ApplicationTests.ValidatorTest
 {
     public class DeleteUserCommandValidatorTests
     {

@@ -2,7 +2,7 @@
 using Domain.Dtos;
 using Domain.Entities;
 
-namespace PropertyBookingApi.Profiles
+namespace Presentation.Profiles
 {
     public class LogementProfile : Profile
     {

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Application.UseCases.Validators;
 
-namespace Tests.ApplicationTests.ValidatorTest
+namespace UnitTests.ApplicationTests.ValidatorTest
 {
     public class UserCreateCommandValidatorTests
     {

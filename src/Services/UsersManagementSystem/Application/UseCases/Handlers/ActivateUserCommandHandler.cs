@@ -1,16 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Application.Services;
+﻿using Application.Services;
 using Application.UseCases.Commands;
-using Contracts.Events;
-using Contracts.Events.Proprietaires;
-using Contracts.Events.Voyageurs;
 using Domain.Enums;
 using Domain.Interfaces;
-using Domain.Models;
 using MediatR;
 
 namespace Application.UseCases.Handlers

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
-namespace Tests.Helpers
+namespace UnitTests.Helpers
 {
     public static class DbHelper
     {

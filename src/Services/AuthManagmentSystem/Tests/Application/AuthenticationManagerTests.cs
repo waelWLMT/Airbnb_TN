@@ -9,7 +9,7 @@ using Shared.Dtos;
 using Shared.Enums;
 using Xunit;
 
-namespace Tests.Application.Services
+namespace UnitTests.Application.Services
 {
     public class AuthenticationManagerTests
     {

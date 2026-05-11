@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Xunit;
 using Application.AuthProviders;
 
-namespace Tests.Application
+namespace UnitTests.Application
 {
     public class GoogleAuthProviderTests
     {

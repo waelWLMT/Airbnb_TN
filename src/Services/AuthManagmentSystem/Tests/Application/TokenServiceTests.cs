@@ -9,7 +9,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Xunit;
 
-namespace Tests.Application.Services
+namespace UnitTests.Application.Services
 {
     public class TokenServiceTests
     {

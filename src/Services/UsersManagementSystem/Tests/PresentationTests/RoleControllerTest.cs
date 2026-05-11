@@ -10,7 +10,7 @@ using Moq;
 using Tests.Helpers;
 using WebApi.Controllers;
 
-namespace Tests.PresentationTests
+namespace UnitTests.PresentationTests
 {
     public class RoleControllerTest
     {

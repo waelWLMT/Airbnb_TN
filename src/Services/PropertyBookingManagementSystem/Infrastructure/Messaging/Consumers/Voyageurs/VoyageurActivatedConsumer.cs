@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Contracts.Events;
 using Contracts.Events.Voyageurs;
 using Domain.Entities;
 using Domain.Enums;

@@ -11,7 +11,7 @@ using Infrastructure.Repositories;
 using Moq;
 using Tests.Helpers;
 
-namespace Tests.InfrastructureTests
+namespace UnitTests.InfrastructureTests
 {
     public class UserReadRepositoryTest
     {

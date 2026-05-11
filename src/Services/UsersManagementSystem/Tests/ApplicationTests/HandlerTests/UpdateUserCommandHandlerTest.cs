@@ -10,7 +10,7 @@ using Domain.Models;
 using Moq;
 using Tests.Helpers;
 
-namespace Tests.ApplicationTests.HandlerTests
+namespace UnitTests.ApplicationTests.HandlerTests
 {
     public class UpdateUserCommandHandlerTest
     {

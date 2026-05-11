@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Domain.Models;
 
-namespace Tests.Helpers
+namespace UnitTests.Helpers
 {
     public static class RolesTestData
     {
