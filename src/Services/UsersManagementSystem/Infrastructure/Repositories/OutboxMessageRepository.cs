@@ -8,7 +8,7 @@ using Domain.Models;
 
 namespace Infrastructure.Repositories
 {
-    public class OutboxMessageRepository : Repository<OutboxMessage>, IOutboxMessageRepository
+    public class OutboxMessageRepository : Repository<OutboxMessage>, IOutboxMessageWriteRepository
     {
         public OutboxMessageRepository(UsersDbContext context): base(context)
         {

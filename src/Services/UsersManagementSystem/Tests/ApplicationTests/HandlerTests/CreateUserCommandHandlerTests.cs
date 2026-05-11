@@ -19,13 +19,15 @@ namespace Tests.ApplicationTests.HandlerTests
     {
         private readonly Mock<IUnitOfWork> _moqUnitOfWork;
         private readonly Mock<IUserWriteRepository> _moqUserWriteRepository;
-        private readonly Mock<IOutboxMessageRepository> _moqOutBoxMessageRepository;
+        private readonly Mock<IOutboxMessageWriteRepository> _moqOutBoxMessageRepository;
+        private readonly Mock<ICorrelationContext> _moqCorrelationContext;
 
         public CreateUserCommandHandlerTests()
         {
             _moqUnitOfWork = new Mock<IUnitOfWork>();
             _moqUserWriteRepository = new Mock<IUserWriteRepository>();
-            _moqOutBoxMessageRepository = new Mock<IOutboxMessageRepository>();
+            _moqOutBoxMessageRepository = new Mock<IOutboxMessageWriteRepository>();
+            _moqCorrelationContext = new Mock<ICorrelationContext>();
         }
 
         [Fact]
@@ -48,7 +50,8 @@ namespace Tests.ApplicationTests.HandlerTests
                 (
                 _moqUnitOfWork.Object,
                 _moqUserWriteRepository.Object, 
-                _moqOutBoxMessageRepository.Object
+                _moqOutBoxMessageRepository.Object,
+                _moqCorrelationContext.Object
                 );            
 
             // Act  
@@ -86,7 +89,8 @@ namespace Tests.ApplicationTests.HandlerTests
                 (
                 _moqUnitOfWork.Object,
                 _moqUserWriteRepository.Object, 
-                _moqOutBoxMessageRepository.Object
+                _moqOutBoxMessageRepository.Object,
+                _moqCorrelationContext.Object
                 );
             
            

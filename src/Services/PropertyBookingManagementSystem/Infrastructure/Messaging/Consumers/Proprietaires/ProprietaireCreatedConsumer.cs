@@ -9,6 +9,7 @@ using Domain.Entities;
 using Domain.Enums;
 using Domain.Interfaces;
 using MassTransit;
+using Microsoft.Extensions.Logging;
 
 
 namespace Infrastructure.Messaging.Consumers.Proprietaires
@@ -18,17 +19,21 @@ namespace Infrastructure.Messaging.Consumers.Proprietaires
         private readonly IUnitOfWork _unitOfWork;
         private readonly IProprietaireReadRepository _proprietaireReadRepository;
         private readonly IProprietaireWriteRepository _proprietaireWriteRepository;
+        private readonly ILogger<ProprietaireCreatedConsumer> _logger;
 
-        public ProprietaireCreatedConsumer(IUnitOfWork unitOfWork, IProprietaireReadRepository proprietaireReadRepository, IProprietaireWriteRepository proprietaireWriteRepository)
+        public ProprietaireCreatedConsumer(IUnitOfWork unitOfWork,
+            IProprietaireReadRepository proprietaireReadRepository,
+            IProprietaireWriteRepository proprietaireWriteRepository,
+            ILogger<ProprietaireCreatedConsumer> logger)
         {
             _unitOfWork = unitOfWork;
             _proprietaireReadRepository = proprietaireReadRepository;
             _proprietaireWriteRepository = proprietaireWriteRepository;
+            _logger = logger;
         }
         public async Task Consume(ConsumeContext<ProprietaireCreatedEvent> context)
         {
-
-            Console.WriteLine("Proprietaire Created Consumer received message");
+            _logger.LogInformation("Proprietaire Created Consumer received message");
 
             var message = context.Message;
 
@@ -36,12 +41,13 @@ namespace Infrastructure.Messaging.Consumers.Proprietaires
             {
                 var userId = message.UserId;
                 var userExist = await _proprietaireReadRepository.AnyAsync(l => l.UserId == userId, context.CancellationToken);
-                
+
                 if (!userExist)
                     await HandleProprietaireCreation(userId, context);
-               
             }
-            
+
+            _logger.LogInformation("Proprietaire Created Event has been treated");
+
         }
         private async Task HandleProprietaireCreation(Guid userId, ConsumeContext context)
         {

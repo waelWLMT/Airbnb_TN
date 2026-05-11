@@ -46,7 +46,7 @@ namespace Infrastructure.Messaging.Consumers.Voyageurs
 
             if (voyageur is not null)
             {
-                voyageur.IsActive = voyageurActivatedEvent.IsActive;
+                voyageur.IsActive = voyageurActivatedEvent.IsActivated;
                 await _voyageurWriteRepsoitory.UpdateAsync(voyageur, cancellationToken);
                 await _unitOfWork.CommitAsync(cancellationToken);
             }

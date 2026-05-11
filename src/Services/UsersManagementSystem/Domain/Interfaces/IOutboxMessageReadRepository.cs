@@ -9,6 +9,6 @@ namespace Domain.Interfaces
 {
     public interface IOutboxMessageReadRepository : IReadRepository<OutboxMessage>
     {
-        Task<List<OutboxMessage>> GetNotProcessededMessages(int nbrMessage);
+        Task<List<OutboxMessage>> GetPendingMessagesAsync(int batchSize);
     }
 }

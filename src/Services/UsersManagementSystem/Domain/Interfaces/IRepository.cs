@@ -12,5 +12,7 @@ namespace Domain.Interfaces
         public Task AddAsync(T t, CancellationToken ct = default);
         public Task DeleteAsync(T t, CancellationToken ct = default);
         public Task UpdateAsync(T t, CancellationToken ct = default);
+        public Task UpdateRangeAsync(IEnumerable<T> t, CancellationToken ct = default);
+
     }
 }

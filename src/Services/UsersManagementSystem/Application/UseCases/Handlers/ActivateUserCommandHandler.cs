@@ -20,14 +20,22 @@ namespace Application.UseCases.Handlers
         private readonly IUnitOfWork _unitOfWork;
         private readonly IUserReadRepository _userReadRepository;
         private readonly IUserWriteRepository _userWriteRepositroy;
-        private readonly IOutboxMessageRepository _outboxMessageRepository;
+        private readonly IOutboxMessageWriteRepository _outboxMessageRepository;
+        private readonly ICorrelationContext _correlationContext;
 
-        public ActivateUserCommandHandler(IUnitOfWork unitOfWork, IUserReadRepository userReadRepository, IUserWriteRepository userWriteRepositroy, IOutboxMessageRepository outboxMessageRepository)
+        public ActivateUserCommandHandler(
+            IUnitOfWork unitOfWork,
+            IUserReadRepository userReadRepository,
+            IUserWriteRepository userWriteRepositroy,
+            IOutboxMessageWriteRepository outboxMessageRepository,
+            ICorrelationContext correlationContext)
         {
             _unitOfWork = unitOfWork;
             _userReadRepository = userReadRepository;
             _userWriteRepositroy = userWriteRepositroy;
             _outboxMessageRepository = outboxMessageRepository;
+            _correlationContext = correlationContext;
+            
         }
         public async Task<bool> Handle(ActivateUserCommand request, CancellationToken cancellationToken)
         {
@@ -47,8 +55,8 @@ namespace Application.UseCases.Handlers
 
 
             var outboxMessage = user.RoleId == (int)UserRole.Voyageur
-                                                                    ? OutBoxMessageBuilder.BuildVoyageurActivatedMessage(user)
-                                                                    : OutBoxMessageBuilder.BuildProprietaireActivatedMessage(user);
+                                                                    ? OutBoxMessageBuilder.BuildVoyageurActivatedMessage(user, _correlationContext.CorrelationId)
+                                                                    : OutBoxMessageBuilder.BuildProprietaireActivatedMessage(user, _correlationContext.CorrelationId);
 
             await _outboxMessageRepository.AddAsync(outboxMessage);
 

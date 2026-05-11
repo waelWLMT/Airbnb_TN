@@ -3,8 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Contracts.Abstractions;
+using Contracts.Attributes;
 
 namespace Contracts.Events.Voyageurs
 {
-    public record VoyageurCreatedEvent(Guid UserId);    
+    [IntegrationEvent(EventNames.VoyageurCreated)]
+    public class VoyageurCreatedEvent : IIntegrationEvent
+    {
+        public Guid UserId { get; init; }
+    }
 }

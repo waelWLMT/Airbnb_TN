@@ -1,33 +1,28 @@
 using Application;
+using Domain.Interfaces;
 using Infrastructure;
 using MassTransit;
+using Presentation;
+using Presentation.Helpers;
+using Presentation.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
-var RabbiMQConfig = builder.Configuration.GetSection("RabbitMQ");
 
 // Add services to the container.
 
-// Register Messaging services
-builder.Services.AddMassTransit(x =>
-{
-    x.UsingRabbitMq((context, cfg) =>
-    {
-        cfg.Host(RabbiMQConfig["Host"], "/", h =>
-        {
-            h.Username(RabbiMQConfig["Username"]);
-            h.Password(RabbiMQConfig["Password"]);
-        });
-    });
-});
+builder.Services.AddMassTransitConfigurationExtension(builder.Configuration);
 
 // Register sevices from infrastructure
-builder.Services.RegisterInfrastructure(builder.Configuration.GetConnectionString("UserDbCnx")!);
+builder.Services.RegisterInfrastructureExtension(builder.Configuration.GetConnectionString("UserDbCnx")!);
 
 // Register services from application
-builder.Services.RegisterApplication();
+builder.Services.RegisterApplicationExtension();
 
 // Register MediatR
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+
+// Register HttpContextAccessor for CorrelationId
+builder.Services.AddScoped<ICorrelationContext, CorrelationContext>();
 
 // addControllers
 builder.Services.AddControllers();
@@ -43,14 +38,20 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.MapControllers();
+// 1. CORRELATION ID (TOUJOURS PREMIER)
+app.UseMiddleware<CorrelationIdMiddleware>();
+
+// 2. LOG CONTEXT (Serilog scope)
+app.UseMiddleware<LogContextMiddleware>();
+
+// 3. Routing
+app.UseRouting();
 
 if (app.Environment.IsProduction())
 {
     app.UseHttpsRedirection();
 }
 
+app.MapControllers();
+
 app.Run();
-
-
-

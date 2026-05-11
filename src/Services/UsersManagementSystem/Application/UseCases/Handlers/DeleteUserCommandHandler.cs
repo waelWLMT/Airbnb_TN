@@ -16,14 +16,21 @@ namespace Application.UseCases.Handlers
         private readonly IUnitOfWork _unitOfWork;
         private readonly IUserWriteRepository _userWriteRepository;
         private readonly IUserReadRepository _userReadRepository;
-        private readonly IOutboxMessageRepository _outBoxMessageRepository;
+        private readonly IOutboxMessageWriteRepository _outBoxMessageRepository;
+        private readonly ICorrelationContext _correlationContext;
 
-        public DeleteUserCommandHandler(IUnitOfWork unitOfWork, IUserReadRepository userReadRepository, IUserWriteRepository userWriteRepository, IOutboxMessageRepository outboxMessageRepository)
+        public DeleteUserCommandHandler(
+            IUnitOfWork unitOfWork,
+            IUserReadRepository userReadRepository,
+            IUserWriteRepository userWriteRepository,
+            IOutboxMessageWriteRepository outboxMessageRepository,
+            ICorrelationContext correlationContext)
         {
             _unitOfWork = unitOfWork;
             _userWriteRepository = userWriteRepository;
             _userReadRepository = userReadRepository;
             _outBoxMessageRepository = outboxMessageRepository;
+            _correlationContext = correlationContext;
         }
 
         public async Task<bool> Handle(DeleteUserCommand command, CancellationToken cancellationToken)
@@ -41,8 +48,8 @@ namespace Application.UseCases.Handlers
             }
 
             var outboxMessage = user.RoleId == (int) UserRole.Voyageur
-                    ? OutBoxMessageBuilder.BuildVoyageurDeletedMessage(user)
-                    : OutBoxMessageBuilder.BuildProprietaireDeletedMessage(user);
+                    ? OutBoxMessageBuilder.BuildVoyageurDeletedMessage(user, _correlationContext.CorrelationId)
+                    : OutBoxMessageBuilder.BuildProprietaireDeletedMessage(user, _correlationContext.CorrelationId);
 
             await _outBoxMessageRepository.AddAsync(outboxMessage, cancellationToken);
             await _unitOfWork.CommitAsync(cancellationToken);

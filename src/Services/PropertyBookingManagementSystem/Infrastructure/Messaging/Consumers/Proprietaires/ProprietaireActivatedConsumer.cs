@@ -48,7 +48,7 @@ namespace Infrastructure.Messaging.Consumers.Proprietaires
             
             if(proprietaire != null)
             {
-                proprietaire.IsActive = proprietaireActivatedEvent.IsActive;
+                proprietaire.IsActive = proprietaireActivatedEvent.IsActivated;
                 await _proprietaireWriteRepository.UpdateAsync(proprietaire, cancellationToken);
                 await _unitOfWork.CommitAsync(cancellationToken);
             }

@@ -30,5 +30,9 @@ namespace Infrastructure.Repositories
         {
             await Task.Run(() => _dbSet.Update(t), ct);
         }
+        public async Task UpdateRangeAsync(IEnumerable<T> t, CancellationToken ct = default)
+        {
+            await Task.Run(() => _dbSet.UpdateRange(t), ct);
+        }
     }
 }

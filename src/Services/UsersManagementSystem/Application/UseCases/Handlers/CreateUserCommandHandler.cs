@@ -19,13 +19,19 @@ namespace Application.UseCases.Handlers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IUserWriteRepository _userWriteRepository;
-        private readonly IOutboxMessageRepository _outboxMessageRepository;
+        private readonly IOutboxMessageWriteRepository _outboxMessageRepository;
+        private readonly ICorrelationContext _correlationContext;
 
-        public CreateUserCommandHandler(IUnitOfWork unitOfWork, IUserWriteRepository userWriteRepository, IOutboxMessageRepository outboxMessageRepository)
+        public CreateUserCommandHandler(IUnitOfWork unitOfWork,
+            IUserWriteRepository userWriteRepository,
+            IOutboxMessageWriteRepository outboxMessageRepository,
+            ICorrelationContext correlationContext
+            )
         {
             _unitOfWork = unitOfWork;
             _userWriteRepository = userWriteRepository;
             _outboxMessageRepository = outboxMessageRepository;
+            _correlationContext = correlationContext;
         }
         public async Task<User> Handle(CreateUserCommand request, CancellationToken cancellationToken)
         {
@@ -40,8 +46,8 @@ namespace Application.UseCases.Handlers
             }
 
             var outboxMessage = user.RoleId == (int)UserRole.Voyageur
-                                                ? OutBoxMessageBuilder.BuildVoyageurCreatedMessage(user)
-                                                : OutBoxMessageBuilder.BuildProprietaireCreatedMessage(user);
+                                                ? OutBoxMessageBuilder.BuildVoyageurCreatedMessage(user, _correlationContext.CorrelationId)
+                                                : OutBoxMessageBuilder.BuildProprietaireCreatedMessage(user, _correlationContext.CorrelationId);
 
             await _outboxMessageRepository.AddAsync(outboxMessage, cancellationToken);
 

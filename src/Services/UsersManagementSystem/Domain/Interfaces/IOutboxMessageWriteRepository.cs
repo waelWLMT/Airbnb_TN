@@ -7,7 +7,7 @@ using Domain.Models;
 
 namespace Domain.Interfaces
 {
-    public interface IOutboxMessageRepository : IRepository<OutboxMessage>
+    public interface IOutboxMessageWriteRepository : IRepository<OutboxMessage>
     {
 
     }
